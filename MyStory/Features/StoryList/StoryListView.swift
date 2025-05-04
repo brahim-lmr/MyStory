@@ -8,8 +8,29 @@
 import SwiftUI
 
 struct StoryListView: View {
+    
+    @StateObject var viewModel = StoryListViewModel()
+    
+    @State private var users: [User] = []
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+            
+            ScrollView(
+                .horizontal,
+                showsIndicators: false
+            ) {
+                LazyHStack(spacing: 0) {
+                    ForEach(users, id: \.id) { user in
+                        AvatarView(user: user)
+                            .padding(.all, 8)
+                    }
+                }
+            }
+            .onAppear(perform: {
+                Task {
+                    users = try await viewModel.loadUsers()
+                }
+            })
     }
 }
 
