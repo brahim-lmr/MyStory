@@ -36,10 +36,10 @@ struct StoryLoader {
     
     private static func generateFakeStoryItems(for user: User) -> [StoryItem] {
         let count = Int.random(in: 1...3)
-        return (1...count).map { _ in
+        return (1...count).map { index in
             StoryItem(
                 id: UUID(),
-                imageURL: URL(string: "https://picsum.photos/300/500?random=\(UUID().uuidString)")!
+                imageURL: URL(string: "https://picsum.photos/seed/\(user.id)\(index)/200/200")!
             )
         }
     }

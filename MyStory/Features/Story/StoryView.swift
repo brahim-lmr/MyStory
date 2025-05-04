@@ -11,25 +11,52 @@ struct StoryView: View {
     
     @Environment(\.dismiss) var dismiss
     
-    var user: User
-
+    @State private var currentIndex = 0
+    
+    var story: Story
+    
     var body: some View {
         NavigationStack {
             ZStack {
-                AsyncImage(url: URL(string: "https://picsum.photos/300/500?random=\(UUID().uuidString)")!){ image in
+                
+                let storyItem = story.items[currentIndex]
+                
+                AsyncImage(url: storyItem.imageURL){ image in
                     image
                         .resizable()
                     
                 } placeholder: {
                     ProgressView()
                 }
+                .id(currentIndex)
                 
-                
+                                
                 VStack {
                     
                     createProgressView()
+                    Spacer()
+                    HStack(spacing: 0) {
+                        
+                        Color.clear
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if currentIndex > 0 {
+                                    currentIndex -= 1
+                                }
+                            }
+                        
+                        Color.clear
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if currentIndex < story.items.count - 1 {
+                                    currentIndex += 1
+                                }
+                            }
+                    }
+                    .frame(height: 200)
                     
                     Spacer()
+                    
                     HStack {
                         createReactionButton(type: .like)
                         createReactionButton(type: .dislike)
@@ -37,7 +64,6 @@ struct StoryView: View {
                     }
                     .padding(.bottom, 16)
                 }
-                
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -64,9 +90,9 @@ struct StoryView: View {
     
     private func createProgressView() -> some View {
         HStack(spacing: 4) {
-            ForEach(0...3, id: \.self) { index in
+            ForEach(0...story.items.count - 1, id: \.self) { index in
                 Capsule()
-                    .fill(Color.white)
+                    .fill(index <= currentIndex ? Color.white.opacity(0.9) : Color.white.opacity(0.2))
                     .frame(height: 4)
                     .frame(maxWidth: .infinity)
                 
@@ -84,10 +110,26 @@ struct StoryView: View {
 
 #Preview {
     StoryView(
-        user: User(
-            id: 1,
-            username: "Brahim",
-            avatarURL: URL(string: "https://i.pravatar.cc/300?u=1")!
+        story: Story(
+            id: UUID(),
+            user: User(
+                id: 1,
+                username: "Brahim",
+                avatarURL: URL(string: "https://i.pravatar.cc/300?u=1")!
+            ),
+            items: [
+                StoryItem(
+                    id: UUID(),
+                    imageURL: URL(string: "https://picsum.photos/seed/\(1)/200/200")!
+                ),
+                
+                StoryItem(
+                    id: UUID(),
+                    imageURL: URL(string: "https://picsum.photos/seed/\(2)/200/200")!
+                )
+            ]
         )
     )
 }
+
+
